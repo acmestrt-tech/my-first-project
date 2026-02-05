@@ -1,55 +1,86 @@
-
 import random
+import time
 
-# 1. Functions (Tools)
-def get_high_score():
+# Color Codes
+GREEN = "\033[92m"
+RED = "\033[91m"
+YELLOW = "\033[93m"
+CYAN = "\033[96m"
+RESET = "\033[0m"
+
+# 1. Functions (Leaderboard Logic)
+def get_leaderboard():
     try:
         with open("highscore.txt", "r") as f:
-            return int(f.read())
+            scores = [int(line.strip()) for line in f.readlines()]
+            return sorted(scores, reverse=True)[:3]
     except:
-        return 0
+        return [0, 0, 0]
 
-def save_high_score(new_score):
+def save_leaderboard(scores):
     with open("highscore.txt", "w") as f:
-        f.write(str(new_score))
+        for s in scores:
+            f.write(f"{s}\n")
 
-# 2. Setup (Ingredients)
-high_score = get_high_score()
+# 2. Setup
+leaderboard = get_leaderboard()
 score = 0
 lives = 3
+time_limit = 5
 
-# 3. The Game Loop (The Cooking)
+print(f"{CYAN}🏆 --- MATH TURBO: LEADERBOARD EDITION --- 🏆{RESET}")
+print(f"Top Record: {leaderboard[0]}")
+print("Choose Difficulty: (1) Easy (2) Medium (3) Hard")
+choice = input("> ")
+
+if choice == "3":
+    base_diff, scale = 100, 100
+elif choice == "2":
+    base_diff, scale = 50, 50
+else:
+    base_diff, scale = 20, 20
+
+# 3. The Loop
 while lives > 0:
     level = (score // 5) + 1
-    difficulty = 50 + (score // 5 * 50) 
+    difficulty = base_diff + (score // 5 * scale) 
+    current_timer = max(1.5, time_limit - (score // 5 * 0.5))
     
     num1 = random.randint(1, difficulty)
     num2 = random.randint(1, difficulty)
     correct_answer = num1 + num2
 
-    print(f"\n--- Level {level} | ❤️ Lives: {lives} | Record: {high_score} ---")
-    user_input = input(f"What is {num1} + {num2}? (or 'exit'): ")
+    print(f"\n{YELLOW}--- Level {level} | ❤️ Lives: {lives} | ⏱️ Limit: {current_timer:.1f}s ---{RESET}")
+    
+    start_time = time.time()
+    user_input = input(f"What is {num1} + {num2}? ")
+    time_taken = time.time() - start_time
 
-    if user_input.lower() == 'exit':
+    if user_input.strip().lower() == 'exit':
         break
 
     try:
-        if int(user_input) == correct_answer:
+        user_val = int(user_input)
+        if time_taken > current_timer:
+            lives -= 1
+            print(f"{RED}⏰ TOO SLOW! Limit was {current_timer:.1f}s.{RESET}")
+        elif user_val == correct_answer:
             score += 1
-            print(f"✨ Correct! Score: {score}")
+            print(f"{GREEN}✨ Correct! ({time_taken:.1f}s) Score: {score}{RESET}")
         else:
             lives -= 1
-            if lives > 0:
-                print(f"💀 Wrong! The answer was {correct_answer}.")
-            else:
-                print(f"💥 GAME OVER! The answer was {correct_answer}.")
+            print(f"{RED}💀 Wrong! The answer was {correct_answer}.{RESET}")
     except ValueError:
-        print("❌ Invalid input! Type a number.")
+        print(f"{YELLOW}❌ Invalid input! Type a number.{RESET}")
 
-# 4. Wrap Up (Serving)
-if score > high_score:
-    print(f"\n🏆 NEW RECORD: {score}!")
-    save_high_score(score)
-else:
-    print(f"\nFinal Score: {score}")
+# 4. Save and Exit (Final Leaderboard Update)
+leaderboard.append(score)
+leaderboard = sorted(leaderboard, reverse=True)[:3]
+save_leaderboard(leaderboard)
+
+print(f"\n{CYAN}🏆 --- TOP 3 SCORES --- 🏆{RESET}")
+for i, s in enumerate(leaderboard):
+    print(f"{i+1}. {s}")
+
+print(f"\n{YELLOW}Final Score: {score}. Come back soon!{RESET}")
 
