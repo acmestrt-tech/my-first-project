@@ -1,13 +1,15 @@
-# My First Git Project
+# 🚀 My First Python & Git Project
 
-This is my very first repository created using **Termux** on my Samsung phone.
+This is a project I built entirely on my **Samsung phone** using **Termux**. It tracks my journey learning version control and Python.
 
-## Features
-* Simple Python "Hello World" script.
-* Version control managed by Git.
-* Synchronized with GitHub via SSH.
+## 🛠️ Tools Used
+* **Termux**: Linux environment for Android
+* **Python**: The language behind the logic
+* **Git/GitHub**: For versioning and cloud storage
 
-## How to Run
-```bash
-python hello.py
+## 📈 Learning Progress
+- [x] Initialized local Git repository
+- [x] Created branches for experimentation
+- [x] Configured SSH for secure GitHub access
+- [x] Published code to the world
 
